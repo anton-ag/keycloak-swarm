@@ -1,0 +1,56 @@
+version: '3.8'
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  swarm-network:
+    external: true
+
+services:
+
+  postgres:
+    image: postgres:12.5
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: database_password
+    networks:
+      - swarm-network
+    # forwarding this port is not necessary, postgres will be available to keycloak within docker network
+    ports:
+      - 5432:5432
+
+  keycloak:
+    image: antonaag
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: any
+      placement:
+        max_replicas_per_node: 1
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+      DB_PORT: 5432
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_SCHEMA: public
+      DB_PASSWORD: database_password
+      KEYCLOAK_USER: keycloak
+      KEYCLOAK_PASSWORD: keycloak_password
+      KEYCLOAK_PORT: 8080
+      CACHE_OWNERS_COUNT: 2
+      CACHE_OWNERS_AUTH_SESSIONS_COUNT: 2
+      JGROUPS_DISCOVERY_PROTOCOL: TCPPING
+    ports:
+      - 8080:8080
+    networks:
+      - swarm-network
