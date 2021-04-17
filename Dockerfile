@@ -1,7 +1,7 @@
 FROM jboss/keycloak:12.0.4
 
 # add TCPPING discovery protocol settings
-COPY --chown=jboss cli/TCPPING.cli /opt/jboss/tools/cli/jgroups/discovery/
+COPY --chown=jboss TCPPING.cli /opt/jboss/tools/cli/jgroups/discovery/
 
 # add bind-utils utilities
 USER root
