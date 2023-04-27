@@ -4,7 +4,7 @@ This is an attempt at tackling a problem of implementing docker swarm native clu
 I hope this will prove useful for those of you who want to implement some sort of high availability setup.
 
 ## A Problem
-The main goal was to set up a working Keycloak cluster while avoiding a typical Docker Swarm anti-pattern, namely, defining several docker services different in name only (like "keycloak1", "keycloak2", etc.). A setup like like this would require an additional configuration of load balancer or solving the problem of having several endpoints programmatically. There is no need to add an extra instance of haproxy when you can simply delegate the task of load balancing to Docker.
+The main goal was to set up a working Keycloak cluster while avoiding a typical Docker Swarm anti-pattern, namely, defining several docker services different in name only (like "keycloak1", "keycloak2", etc.). A setup like this would require an additional configuration of load balancer or solving the problem of having several endpoints programmatically. There is no need to add an extra instance of haproxy when you can simply delegate the task of load balancing to Docker.
 
 ## A Solution
 But here's the thing: to make sure that Keycloak containers know whom to call to request clustering, one would have to provide perspective peers' ip-addresses, or other alternatives, on startup. For that reason, I decided to teach Keycloak containers how to discover peers dynamically. And to do that they just have to ask Docker about it using the `host` utility. An example of that is provided in my version of `jgroups.sh` script (the part that's added to the original image's script is marked).
@@ -21,9 +21,8 @@ docker build . -t name_of_your_choice:any_tag
 ```
 Alternatively, there is a pre-built image uploaded to DockerHub, `antonaag/keycloak:12.0.4`. It is referenced in `keycloak-stack.yaml`. 
 ### Docker Swarm
-To learn in detail about Docker Swarm, visit the official Docker website. In short, it is a manager for a cluster of Docker Engines, referred to as a "swarm". To test this setup, you should have a cluster of at least 2 Docker hosts.
+To learn in detail about Docker Swarm, visit [the official Docker website](https://docs.docker.com/engine/swarm/). 
 
-[ I guess adding a short manual on how to create a swarm would be great. I'll either do it later or will be happy to get a pull request. ]
 ### Deploying Stack
 To deploy a stack, run the following command on a manager node of your swarm cluster:
 ```
